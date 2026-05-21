@@ -51,16 +51,86 @@ export default function InvoicePrint({ invoices, monthYear, companySettings, onC
         </button>
       </div>
 
-      <style>{`
-        @media print {
-          body * { visibility: hidden; }
-          .print-area, .print-area * { visibility: visible; }
-          .print-area { position: absolute; left: 0; top: 0; width: 100%; }
-        }
-      `}</style>
+     <style>{`
+  @media print {
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
+    body {
+      background: white !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body * {
+      visibility: hidden;
+    }
+
+    .print-area,
+    .print-area * {
+      visibility: visible;
+    }
+
+    .print-area {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      background: white;
+    }
+
+    .print-area .invoice-box {
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+    }
+
+    table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      table-layout: fixed !important;
+    }
+
+    th,
+    td {
+      padding: 8px 6px !important;
+      vertical-align: top !important;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 22%;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      width: 43%;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+      width: 15%;
+      text-align: center !important;
+    }
+
+    th:nth-child(4),
+    td:nth-child(4) {
+      width: 20%;
+      text-align: right !important;
+      white-space: nowrap !important;
+    }
+
+    tfoot td {
+      border-top: 2px solid #d1d5db !important;
+    }
+  }
+`}</style>
 
       <div className="print-area">
-        <div className="border border-gray-200 rounded-xl p-8 bg-white">
+       <div className="invoice-box border border-gray-200 rounded-xl p-8 bg-white">
           <div className="flex items-start justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{companySettings?.company_name || 'CHECK IN POINT RESOURCES'}</h1>
