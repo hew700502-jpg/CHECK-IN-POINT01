@@ -31,12 +31,16 @@ export default function InvoiceGenerator({ checkIns, onSuccess, onCancel }: Invo
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Group check-ins by unit
-  const unitGroups = checkIns.reduce((acc, c) => {
-    if (!acc[c.unit_id]) acc[c.unit_id] = [];
-    acc[c.unit_id].push(c);
-    return acc;
-  }, {} as Record<string, typeof checkIns>);
+const monthlyCheckIns = checkIns.filter(c =>
+  c.check_in_date.slice(0, 7) === monthYear
+);
+
+// Group selected month check-ins by unit
+const unitGroups = monthlyCheckIns.reduce((acc, c) => {
+  if (!acc[c.unit_id]) acc[c.unit_id] = [];
+  acc[c.unit_id].push(c);
+  return acc;
+}, {} as Record<string, typeof monthlyCheckIns>);
 
   const selectedUnits = Object.entries(unitGroups)
     .filter(([uid]) => selected[uid])
