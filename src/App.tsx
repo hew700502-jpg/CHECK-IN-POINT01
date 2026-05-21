@@ -45,10 +45,13 @@ export default function App() {
   const [viewingInvoiceMonth, setViewingInvoiceMonth] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'checkin' | 'unit' | 'invoice-group'; id: string; label: string } | null>(null);
 
-  const [checkInSearch, setCheckInSearch] = useState('');
-  const [checkInUnit, setCheckInUnit] = useState('');
-  const [invoiceMonth, setInvoiceMonth] = useState('');
-  const [companySettings, setCompanySettings] = useState<any>(null);
+const [checkInSearch, setCheckInSearch] = useState('');
+const [checkInUnit, setCheckInUnit] = useState('');
+const [checkInMonth, setCheckInMonth] = useState(
+  new Date().toISOString().slice(0, 7)
+);
+const [invoiceMonth, setInvoiceMonth] = useState('');
+const [companySettings, setCompanySettings] = useState<any>(null);
   const [showSettingsForm, setShowSettingsForm] = useState(false);
 
   const handleLogin = (id: string) => {
@@ -109,13 +112,17 @@ export default function App() {
     fetchAll();
   };
 
-  const filteredCheckIns = checkIns.filter(c => {
-    const matchSearch = !checkInSearch ||
-      c.guest_name.toLowerCase().includes(checkInSearch.toLowerCase()) ||
-      c.phone_number.includes(checkInSearch);
-    const matchUnit = !checkInUnit || c.unit_id === checkInUnit;
-    return matchSearch && matchUnit;
-  });
+ const filteredCheckIns = checkIns.filter(c => {
+  const matchSearch = !checkInSearch ||
+    c.guest_name.toLowerCase().includes(checkInSearch.toLowerCase()) ||
+    c.phone_number.includes(checkInSearch);
+
+  const matchUnit = !checkInUnit || c.unit_id === checkInUnit;
+
+  const matchMonth = c.check_in_date.slice(0, 7) === checkInMonth;
+
+  return matchSearch && matchUnit && matchMonth;
+});
 
   const invoiceMonths = [...new Set(invoices.map(i => i.month_year))].sort((a, b) => b.localeCompare(a));
   const filteredInvoiceMonths = invoiceMonth
@@ -207,7 +214,9 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                   <div>
                     <h2 className="text-xl font-bold text-gray-900">Guest Check-Ins</h2>
-                    <p className="text-sm text-gray-500">{checkIns.length} total record{checkIns.length !== 1 ? 's' : ''}</p>
+                   <p className="text-sm text-gray-500">
+  {filteredCheckIns.length} record{filteredCheckIns.length !== 1 ? 's' : ''} this month
+</p>
                   </div>
                   <button
                     onClick={() => { setEditingCheckIn(null); setShowCheckInForm(true); }}
@@ -240,6 +249,14 @@ export default function App() {
                     </select>
                     <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   </div>
+                  <div>
+  <input
+    type="month"
+    value={checkInMonth}
+    onChange={e => setCheckInMonth(e.target.value)}
+    className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+  />
+</div>
                 </div>
 
                 {filteredCheckIns.length === 0 ? (
