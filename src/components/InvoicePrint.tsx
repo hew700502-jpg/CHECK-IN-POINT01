@@ -1,4 +1,6 @@
 import { Printer } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Invoice } from '../lib/supabase';
 
 interface InvoicePrintProps {
@@ -35,8 +37,80 @@ export default function InvoicePrint({ invoices, monthYear, companySettings, onC
     return acc;
   }, {} as Record<string, any>);
 
-  const grandTotal = Object.values(unitGroups).reduce((sum, g: any) => sum + g.totalFee, 0);
-  const handlePrint = () => window.print();
+ const grandTotal = Object.values(unitGroups).reduce(
+  (sum, g: any) => sum + g.totalFee,
+  0
+);
+
+const handlePrint = () => {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  doc.setFontSize(18);
+
+  doc.text(
+    companySettings?.company_name || 'CHECK IN POINT RESOURCES',
+    14,
+    20
+  );
+
+  doc.setFontSize(11);
+
+  doc.text(
+    `Monthly Cleaning Invoice - ${formatMonth(monthYear)}`,
+    14,
+    28
+  );
+
+  const rows = Object.values(unitGroups).map(
+    (unitData: any, index) => [
+      index + 1,
+      unitData.unit?.name || '-',
+      unitData.guests.map((g: any) => g.name).join(', '),
+      unitData.guests.length.toString(),
+      `RM ${unitData.totalFee.toFixed(2)}`
+    ]
+  );
+
+  autoTable(doc, {
+    startY: 36,
+    head: [['No', 'Unit', 'Guests', 'Count', 'Amount']],
+    body: rows,
+    foot: [[
+      '',
+      '',
+      '',
+      'TOTAL',
+      `RM ${grandTotal.toFixed(2)}`
+    ]],
+    styles: {
+      fontSize: 10,
+      cellPadding: 3,
+      overflow: 'linebreak',
+    },
+    headStyles: {
+      fillColor: [37, 99, 235],
+      halign: 'center',
+    },
+    footStyles: {
+      fontStyle: 'bold',
+      fillColor: [240, 240, 240],
+      textColor: [0, 0, 0],
+    },
+    columnStyles: {
+      0: { halign: 'center', cellWidth: 12 },
+      1: { cellWidth: 35 },
+      2: { cellWidth: 80 },
+      3: { halign: 'center', cellWidth: 20 },
+      4: { halign: 'right', cellWidth: 30 },
+    },
+  });
+
+  doc.save(`Invoice-${monthYear}.pdf`);
+};
 
   return (
     <div className="space-y-6">
@@ -50,84 +124,7 @@ export default function InvoicePrint({ invoices, monthYear, companySettings, onC
           Print / Save PDF
         </button>
       </div>
-
-     <style>{`
-  @media print {
-    @page {
-      size: A4;
-      margin: 12mm;
-    }
-
-    body {
-      background: white !important;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-
-    body * {
-      visibility: hidden;
-    }
-
-    .print-area,
-    .print-area * {
-      visibility: visible;
-    }
-
-    .print-area {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      background: white;
-    }
-
-    .print-area .invoice-box {
-      border: none !important;
-      border-radius: 0 !important;
-      padding: 0 !important;
-      box-shadow: none !important;
-    }
-
-    table {
-      width: 100% !important;
-      border-collapse: collapse !important;
-      table-layout: fixed !important;
-    }
-
-    th,
-    td {
-      padding: 8px 6px !important;
-      vertical-align: top !important;
-    }
-
-    th:nth-child(1),
-    td:nth-child(1) {
-      width: 22%;
-    }
-
-    th:nth-child(2),
-    td:nth-child(2) {
-      width: 43%;
-    }
-
-    th:nth-child(3),
-    td:nth-child(3) {
-      width: 15%;
-      text-align: center !important;
-    }
-
-    th:nth-child(4),
-    td:nth-child(4) {
-      width: 20%;
-      text-align: right !important;
-      white-space: nowrap !important;
-    }
-
-    tfoot td {
-      border-top: 2px solid #d1d5db !important;
-    }
-  }
-`}</style>
+      
 
       <div className="print-area">
        <div className="invoice-box border border-gray-200 rounded-xl p-8 bg-white">
