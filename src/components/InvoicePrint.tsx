@@ -113,7 +113,61 @@ const handlePrint = () => {
       4: { halign: 'right', cellWidth: 30 },
     },
   });
+const finalY =
+  (doc as any).lastAutoTable.finalY || 80;
 
+if (companySettings?.bank_name) {
+
+  doc.setFontSize(12);
+
+  doc.text(
+    'Bank Details',
+    14,
+    finalY + 15
+  );
+
+  doc.setFontSize(10);
+
+  doc.text(
+    `Bank Name: ${companySettings.bank_name}`,
+    14,
+    finalY + 23
+  );
+
+  doc.text(
+    `Account Holder: ${companySettings.account_holder || '-'}`,
+    14,
+    finalY + 30
+  );
+
+  doc.text(
+    `Account Number: ${companySettings.account_number || '-'}`,
+    14,
+    finalY + 37
+  );
+}
+
+if (companySettings?.invoice_remark) {
+
+  doc.setFontSize(12);
+
+  doc.text(
+    'Terms & Remarks',
+    14,
+    finalY + 52
+  );
+
+  doc.setFontSize(10);
+
+  doc.text(
+    companySettings.invoice_remark,
+    14,
+    finalY + 60,
+    {
+      maxWidth: 180,
+    }
+  );
+}
   doc.save(`Invoice-${monthYear}.pdf`);
 };
 
