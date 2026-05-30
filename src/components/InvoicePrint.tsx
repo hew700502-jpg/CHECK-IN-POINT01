@@ -69,7 +69,12 @@ const handlePrint = () => {
     (unitData: any, index) => [
       index + 1,
       unitData.unit?.name || '-',
-      unitData.guests.map((g: any) => g.name).join(', '),
+     unitData.guests
+  .map(
+    (g: any) =>
+      `${formatDate(g.date)} - ${g.name}`
+  )
+  .join('\n'),
       unitData.guests.length.toString(),
       `RM ${unitData.totalFee.toFixed(2)}`
     ]
