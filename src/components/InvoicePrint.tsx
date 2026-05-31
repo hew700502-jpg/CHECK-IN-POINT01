@@ -43,6 +43,10 @@ export default function InvoicePrint({ invoices, monthYear, companySettings, onC
 );
 
 const handlePrint = () => {
+
+Object.entries(unitGroups).forEach(
+  ([unitId, unitData]: any) => {
+
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -64,8 +68,7 @@ const handlePrint = () => {
     14,
     28
   );
-  const firstUnit =
-  Object.values(unitGroups)[0] as any;
+ const firstUnit = unitData;
 
 doc.setFontSize(12);
 
@@ -77,7 +80,7 @@ doc.text(
 
   const rows: any[] = [];
 
-Object.values(unitGroups).forEach(
+[unitData].forEach(
   (unitData: any) => {
 
    unitData.guests
@@ -211,7 +214,12 @@ if (companySettings?.invoice_remark) {
     }
   );
 }
-  doc.save(`Invoice-${monthYear}.pdf`);
+ doc.save(
+  `${unitData.unit?.name || 'Unit'}_${monthYear}_Invoice.pdf`
+);
+
+});
+  
 };
 
   return (
