@@ -65,32 +65,40 @@ const handlePrint = () => {
     28
   );
 
-  const rows = Object.values(unitGroups).map(
-    (unitData: any, index) => [
-      index + 1,
-      unitData.unit?.name || '-',
-     unitData.guests
-  .map(
-    (g: any) =>
-      `${formatDate(g.date)} - ${g.name}`
-  )
-  .join('\n'),
-      unitData.guests.length.toString(),
-      `RM ${unitData.totalFee.toFixed(2)}`
-    ]
-  );
+  const rows: any[] = [];
+
+Object.values(unitGroups).forEach(
+  (unitData: any) => {
+
+    unitData.guests.forEach((g: any) => {
+
+      rows.push([
+        formatDate(g.date),
+        g.name,
+        `RM ${(
+          unitData.totalFee /
+          unitData.guests.length
+        ).toFixed(2)}`
+      ]);
+
+    });
+
+  }
+);
 
   autoTable(doc, {
     startY: 36,
-    head: [['No', 'Unit', 'Guests', 'Count', 'Amount']],
+  head: [[
+  'Check-In Date',
+  'Guest Name',
+  'Cleaning Fee (RM)'
+]],
     body: rows,
-    foot: [[
-      '',
-      '',
-      '',
-      'TOTAL',
-      `RM ${grandTotal.toFixed(2)}`
-    ]],
+   foot: [[
+  'Total',
+  '',
+  `RM ${grandTotal.toFixed(2)}`
+]],
     styles: {
       fontSize: 10,
       cellPadding: 3,
@@ -105,13 +113,20 @@ const handlePrint = () => {
       fillColor: [240, 240, 240],
       textColor: [0, 0, 0],
     },
-    columnStyles: {
-      0: { halign: 'center', cellWidth: 12 },
-      1: { cellWidth: 35 },
-      2: { cellWidth: 80 },
-      3: { halign: 'center', cellWidth: 20 },
-      4: { halign: 'right', cellWidth: 30 },
-    },
+   columnStyles: {
+  0: {
+    cellWidth: 45
+  },
+
+  1: {
+    cellWidth: 95
+  },
+
+  2: {
+    halign: 'right',
+    cellWidth: 40
+  },
+},
   });
 const finalY =
   (doc as any).lastAutoTable.finalY || 80;
