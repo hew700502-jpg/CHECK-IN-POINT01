@@ -64,6 +64,16 @@ const handlePrint = () => {
     14,
     28
   );
+  const firstUnit =
+  Object.values(unitGroups)[0] as any;
+
+doc.setFontSize(12);
+
+doc.text(
+  `Unit: ${firstUnit?.unit?.name || '-'}`,
+  14,
+  35
+);
 
   const rows: any[] = [];
 
@@ -105,7 +115,7 @@ Object.values(unitGroups).forEach(
 );
 
   autoTable(doc, {
-    startY: 36,
+    startY: 42,
   head: [[
   'Check-In Date',
   'Guest Name',
