@@ -37,7 +37,7 @@ export default function InvoicePrint({ invoices, monthYear, companySettings, onC
     return acc;
   }, {} as Record<string, any>);
 
- const grandTotal = Object.values(unitGroups).reduce(
+const grandTotal = Object.values(unitGroups).reduce(
   (sum, g: any) => sum + g.totalFee,
   0
 );
@@ -69,6 +69,7 @@ Object.entries(unitGroups).forEach(
     28
   );
  const firstUnit = unitData;
+const unitTotal = unitData.totalFee;
 
 doc.setFontSize(12);
 
@@ -128,7 +129,7 @@ doc.text(
    foot: [[
   'Total',
   '',
-  `RM ${grandTotal.toFixed(2)}`
+ `RM ${unitTotal.toFixed(2)}`
 ]],
     styles: {
       fontSize: 10,
