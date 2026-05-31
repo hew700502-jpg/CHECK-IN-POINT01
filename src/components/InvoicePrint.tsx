@@ -70,7 +70,25 @@ const handlePrint = () => {
 Object.values(unitGroups).forEach(
   (unitData: any) => {
 
-    unitData.guests.forEach((g: any) => {
+   unitData.guests
+  .sort(
+    (a: any, b: any) => {
+
+      const dateA = new Date(
+        a.date + 'T00:00:00'
+      );
+
+      const dateB = new Date(
+        b.date + 'T00:00:00'
+      );
+
+      return (
+        dateA.getTime() -
+        dateB.getTime()
+      );
+    }
+  )
+  .forEach((g: any) => {
 
       rows.push([
         formatDate(g.date),
